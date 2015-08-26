@@ -626,6 +626,34 @@ package org.mangui.hls.stream {
             var _disHeader : FLVData;
             var headercounter : uint = 0;
             var _newheaderTags : Vector.<FLVData> = new Vector.<FLVData>();
+
+            function insertHeaderTags():void {
+                if (_disHeader) {
+                    headercounter--;
+                    // Log.info("push DISCONTINUITY header tags/position:" + _disHeader.position);
+                    _disHeader.position = clipping_position;
+                    _disHeader.sliding = 0;
+                    _newheaderTags.push(_disHeader);
+                    _disHeader = null;
+                }
+                if (_aacHeader) {
+                    headercounter--;
+                    // Log.info("push AAC header tags/position:" + _aacHeader.position);
+                    _aacHeader.position = clipping_position;
+                    _aacHeader.sliding = 0;
+                    _newheaderTags.push(_aacHeader);
+                    _aacHeader = null;
+                }
+                if (_avcHeader) {
+                    headercounter--;
+                    // Log.info("push AVC header tags/position:" + _avcHeader.position);
+                    _avcHeader.position = clipping_position;
+                    _avcHeader.sliding = 0;
+                    _newheaderTags.push(_avcHeader);
+                    _avcHeader = null;
+                }
+            }
+
             for each (var data : FLVData in _headerTags) {
                 if ((data.positionAbsolute - _playlistSlidingMain ) < clipping_position) {
                     switch(data.tag.type) {
@@ -648,33 +676,15 @@ package org.mangui.hls.stream {
                      * first try to push DISCONTINUITY/AVC HEADER/AAC HEADER tag located
                      * before the clip position
                      */
-                    if (_disHeader) {
-                        headercounter--;
-                        // Log.info("push DISCONTINUITY header tags/position:" + _disHeader.position);
-                        _disHeader.position = clipping_position;
-                        _disHeader.sliding = 0;
-                        _newheaderTags.push(_disHeader);
-                        _disHeader = null;
-                    }
-                    if (_aacHeader) {
-                        headercounter--;
-                        // Log.info("push AAC header tags/position:" + _aacHeader.position);
-                        _aacHeader.position = clipping_position;
-                        _aacHeader.sliding = 0;
-                        _newheaderTags.push(_aacHeader);
-                        _aacHeader = null;
-                    }
-                    if (_avcHeader) {
-                        headercounter--;
-                        // Log.info("push AVC header tags/position:" + _avcHeader.position);
-                        _avcHeader.position = clipping_position;
-                        _avcHeader.sliding = 0;
-                        _newheaderTags.push(_avcHeader);
-                        _avcHeader = null;
-                    }
+                    insertHeaderTags();
                     // Log.info("push tag type/position:" + data.tag.type + "/" + data.position);
                     _newheaderTags.push(data);
                 }
+            }
+
+            // at least one set of tags should be left in header buffer
+            if (_disHeader || _aacHeader || _avcHeader) {
+                insertHeaderTags();
             }
 
             if (headercounter != 0) {

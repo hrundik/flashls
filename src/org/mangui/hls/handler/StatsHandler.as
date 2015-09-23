@@ -7,7 +7,6 @@
     import org.mangui.hls.event.HLSLoadMetrics;
     import org.mangui.hls.event.HLSPlayMetrics;
     import org.mangui.hls.HLS;
-    import org.mangui.hls.model.Stats;
     CONFIG::LOGGING {
         import org.mangui.hls.utils.Log;
     }
@@ -17,7 +16,7 @@
      public class StatsHandler {
         /** Reference to the HLS controller. **/
         private var _hls : HLS;
-        private var _stats : Stats;
+        private var _stats : Object;
         private var _sumLatency : int;
         private var _sumKbps : int;
         private var _sumAutoLevel : int;
@@ -28,6 +27,7 @@
             _hls.addEventListener(HLSEvent.MANIFEST_LOADED, _manifestLoadedHandler);
             _hls.addEventListener(HLSEvent.FRAGMENT_LOADED, _fragmentLoadedHandler);
             _hls.addEventListener(HLSEvent.FRAGMENT_PLAYING,_fragmentPlayingHandler);
+            _hls.addEventListener(HLSEvent.FRAGMENT_SKIPPED,_fragmentSkippedHandler);
             _hls.addEventListener(HLSEvent.FPS_DROP, _fpsDropHandler);
             _hls.addEventListener(HLSEvent.FPS_DROP_LEVEL_CAPPING, _fpsDropLevelCappingHandler);
             _hls.addEventListener(HLSEvent.FPS_DROP_SMOOTH_LEVEL_SWITCH, _fpsDropSmoothLevelSwitchHandler);
@@ -37,21 +37,22 @@
             _hls.removeEventListener(HLSEvent.MANIFEST_LOADED, _manifestLoadedHandler);
             _hls.removeEventListener(HLSEvent.FRAGMENT_LOADED, _fragmentLoadedHandler);
             _hls.removeEventListener(HLSEvent.FRAGMENT_PLAYING, _fragmentPlayingHandler);
+            _hls.removeEventListener(HLSEvent.FRAGMENT_SKIPPED,_fragmentSkippedHandler);
             _hls.removeEventListener(HLSEvent.FPS_DROP, _fpsDropHandler);
             _hls.removeEventListener(HLSEvent.FPS_DROP_LEVEL_CAPPING, _fpsDropLevelCappingHandler);
             _hls.removeEventListener(HLSEvent.FPS_DROP_SMOOTH_LEVEL_SWITCH, _fpsDropSmoothLevelSwitchHandler);
         }
 
-        public function get stats() : Stats {
+        public function get stats() : Object {
             return _stats;
         }
 
         private function _manifestLoadedHandler(event : HLSEvent) : void {
-            _stats = new Stats();
+            _stats = {};
             _stats.levelNb = event.levels.length;
             _stats.levelStart = -1;
             _stats.tech = "flashls,"+Capabilities.version;
-            _stats.fragBuffered = _stats.fragChangedAuto = _stats.fragChangedManual = 0;
+            _stats.fragBuffered = _stats.fragChangedAuto = _stats.fragChangedManual = _stats.fragSkipped = 0;
             _stats.fpsDropEvent = _stats.fpsDropSmoothLevelSwitch = 0;
         };
 
@@ -128,15 +129,26 @@
         }
         _levelLastAuto = autoLevel;
       }
+
+      private function _fragmentSkippedHandler(event : HLSEvent) : void {
+        if(_stats.fragSkipped) {
+            _stats.fragSkipped++;
+        } else {
+            _stats.fragSkipped = 1;
+        }
+      }
+
       private function _fpsDropHandler(event : HLSEvent) : void {
         _stats.fpsDropEvent++;
         _stats.fpsTotalDroppedFrames = _hls.stream.info.droppedFrames;
-      };
+      }
+
       private function _fpsDropLevelCappingHandler(event : HLSEvent) : void {
          _stats.fpsDropLevelCappingMin=event.level;
-      };
+      }
+
       private function _fpsDropSmoothLevelSwitchHandler(event : HLSEvent) : void {
         _stats.fpsDropSmoothLevelSwitch++;
-      };
+      }
   }
 }

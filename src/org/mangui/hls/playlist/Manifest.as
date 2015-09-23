@@ -9,7 +9,6 @@ package org.mangui.hls.playlist {
     import flash.utils.getTimer;
     import org.mangui.hls.constant.HLSLoaderTypes;
     import org.mangui.hls.constant.HLSTypes;
-    import org.mangui.hls.event.HLSEvent;
     import org.mangui.hls.event.HLSLoadMetrics;
     import org.mangui.hls.HLS;
     import org.mangui.hls.model.Fragment;

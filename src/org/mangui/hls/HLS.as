@@ -32,7 +32,7 @@ package org.mangui.hls {
         private var _altAudioLevelLoader : AltAudioLevelLoader;
         private var _audioTrackController : AudioTrackController;
         private var _levelController : LevelController;
-        private var _streamBuffer : StreamBuffer;
+        internal var _streamBuffer : StreamBuffer;
         private var _statsHandler : StatsHandler;
         /** HLS NetStream **/
         private var _hlsNetStream : HLSNetStream;

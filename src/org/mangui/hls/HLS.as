@@ -57,11 +57,15 @@ package org.mangui.hls {
             _hlsURLStream = URLStream as Class;
             _hlsURLLoader = URLLoader as Class;
             // default loader
-            var connection : NetConnection = new NetConnection();
-            connection.connect(null);
-            _hlsNetStream = new HLSNetStream(connection, this, _streamBuffer);
+            _hlsNetStream = createNetStream();
             this.addEventListener(HLSEvent.LEVEL_SWITCH, _levelSwitchHandler);
         };
+
+        protected function createNetStream():HLSNetStream {
+            var connection : NetConnection = new NetConnection();
+            connection.connect(null);
+            return new HLSNetStream(connection, this, _streamBuffer);
+        }
 
         /** Forward internal errors. **/
         override public function dispatchEvent(event : Event) : Boolean {

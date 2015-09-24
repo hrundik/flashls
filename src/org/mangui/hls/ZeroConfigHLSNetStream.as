@@ -23,6 +23,7 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
         _zeroHLS.addEventListener(HLSEvent.MANIFEST_LOADED, onManifestLoaded);
         _zeroHLS.addEventListener(HLSEvent.PLAYBACK_STATE, onPlaybackStateChange);
         _zeroHLS.addEventListener(HLSEvent.PLAYBACK_COMPLETE, onPlaybackComplete);
+        _zeroHLS.addEventListener(HLSEvent.ERROR, onHlsError);
     }
 
     override public function play(...rest):void {
@@ -65,6 +66,14 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
         dispatchEvent(new NetStatusEvent(NetStatusEvent.NET_STATUS, false, false, {
             level: "status",
             code: "NetStream.Play.Stop"
+        }));
+    }
+
+    private function onHlsError(event:HLSEvent):void {
+        dispatchEvent(new NetStatusEvent(NetStatusEvent.NET_STATUS, false, false, {
+            level: "status",
+            code: "NetStream.Play.StreamNotFound",
+            details: event.error.toString()
         }));
     }
 

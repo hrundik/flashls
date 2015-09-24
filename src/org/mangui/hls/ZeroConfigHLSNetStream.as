@@ -1,7 +1,6 @@
 package org.mangui.hls {
 import flash.events.NetStatusEvent;
 import flash.net.NetConnection;
-import flash.net.NetStreamAppendBytesAction;
 
 import org.mangui.hls.event.HLSEvent;
 
@@ -25,6 +24,10 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
     override public function play(...rest):void {
         var file:String = rest[0];
         _zeroHLS.load(file);
+    }
+
+    override public function get time():Number {
+        return _zeroHLS.position;
     }
 
     private function onManifestLoaded(event:HLSEvent):void {

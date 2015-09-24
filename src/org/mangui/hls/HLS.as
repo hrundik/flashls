@@ -220,7 +220,7 @@ package org.mangui.hls {
         };
 
         /** return HLS NetStream **/
-        public function get stream() : NetStream {
+        public function get stream() : HLSNetStream {
             return _hlsNetStream;
         }
 

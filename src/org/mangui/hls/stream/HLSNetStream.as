@@ -288,8 +288,8 @@ package org.mangui.hls.stream {
         }
 
         /* also include skipped duration in get time() so that play position will match fragment position */
-        override public function get time() : Number {
-            return super.time+_skippedDuration;
+        public function get fragmentTime() : Number {
+            return super.time + _skippedDuration;
         }
 
         override public function play(...args) : void {

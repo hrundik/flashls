@@ -43,6 +43,10 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
     }
 
     override public function get time():Number {
+        if (!isNaN(_seekPosition)) {
+            return _seekPosition;
+        }
+
         return _zeroHLS.position;
     }
 

@@ -1,5 +1,7 @@
 package org.mangui.hls {
+import flash.events.NetStatusEvent;
 import flash.net.NetConnection;
+import flash.net.NetStreamAppendBytesAction;
 
 import org.mangui.hls.event.HLSEvent;
 
@@ -17,6 +19,7 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
     public function ZeroConfigHLSNetStream() {
         super(createNetConnection(), (ZeroConfigHLS._netStream = this, _zeroHLS = new ZeroConfigHLS()), _zeroHLS._streamBuffer);
         _zeroHLS.addEventListener(HLSEvent.MANIFEST_LOADED, onManifestLoaded);
+        _zeroHLS.addEventListener(HLSEvent.PLAYBACK_COMPLETE, onPlaybackComplete);
     }
 
     override public function play(...rest):void {
@@ -26,6 +29,13 @@ public class ZeroConfigHLSNetStream extends HLSNetStream {
 
     private function onManifestLoaded(event:HLSEvent):void {
         super.play(null, -1);
+    }
+
+    private function onPlaybackComplete(event:HLSEvent):void {
+        dispatchEvent(new NetStatusEvent(NetStatusEvent.NET_STATUS, false, false, {
+            level: "status",
+            code: "NetStream.Play.Stop"
+        }));
     }
 
     public function get hls():HLS {
